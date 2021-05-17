@@ -5,7 +5,7 @@
       <ID>3</ID>
       <Description>"Money Here ▼"</Description>
       <Options moDeactivateChildrenAsWell="1"/>
-      <LastState Activated="1"/>
+      <LastState/>
       <Color>009700</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -19,13 +19,13 @@
 !openxcom.exe+3B0FAC - 5D       - pop ebp
 */
 
-unregistersymbol(injectPoint)
+unregistersymbol(injectPointMoney)
 unregistersymbol(bLockMoney)
 unregistersymbol(dMoneyMin)
 unregistersymbol(pMoneyAddr)
 
-aobscan( injectPoint, 89 E5 8B 50 FC )
-alloc( memCode, 256 )
+aobscan( injectPointMoney, 89 E5 8B 50 FC )
+alloc( memCodeMoney, 256 )
 
 label(bLockMoney)
 registersymbol(bLockMoney)
@@ -38,7 +38,7 @@ registersymbol(pMoneyAddr)
 
 label(defaultCode)
 
-memCode:
+memCodeMoney:
     mov [pMoneyAddr], eax
     cmp [bLockMoney], #1
     jne defaultCode
@@ -50,7 +50,7 @@ memCode:
 defaultCode:
     mov edx, [eax-04]
     mov eax, [eax-08]
-    jmp injectPoint+7
+    jmp injectPointMoney+7
 bLockMoney:
     dd 0
 dMoneyMin:
@@ -58,23 +58,23 @@ dMoneyMin:
 pMoneyAddr:
     dq 0
 
-injectPoint+2:
-    jmp memCode
+injectPointMoney+2:
+    jmp memCodeMoney
     nop
-registersymbol(injectPoint)
+registersymbol(injectPointMoney)
 
 [DISABLE]
 {$asm}
 
-injectPoint+2:
+injectPointMoney+2:
     db 8B 50 FC 8B 40 F8
 
-unregistersymbol(injectPoint)
+unregistersymbol(injectPointMoney)
 unregistersymbol(bLockMoney)
 unregistersymbol(dMoneyMin)
 unregistersymbol(pMoneyAddr)
 
-dealloc(memCode)
+dealloc(memCodeMoney)
 
 </AssemblerScript>
       <CheatEntries>
@@ -101,7 +101,6 @@ writeInteger( "bLockMoney", 0 )
         <CheatEntry>
           <ID>18</ID>
           <Description>"Money"</Description>
-          <LastState Value="69139547" RealAddress="11BE4CD0"/>
           <ShowAsSigned>1</ShowAsSigned>
           <VariableType>8 Bytes</VariableType>
           <Address>[pMoneyAddr]-8</Address>
@@ -109,7 +108,6 @@ writeInteger( "bLockMoney", 0 )
         <CheatEntry>
           <ID>224</ID>
           <Description>"Money Min. value"</Description>
-          <LastState Value="4294967" RealAddress="001B0033"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>8 Bytes</VariableType>
           <Address>dMoneyMin</Address>

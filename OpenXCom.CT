@@ -101,7 +101,7 @@ writeInteger( "bLockMoney", 0 )
         <CheatEntry>
           <ID>18</ID>
           <Description>"Money"</Description>
-          <LastState Value="99309697" RealAddress="11E70BE0"/>
+          <LastState Value="9658999196614656" RealAddress="118F0B38"/>
           <ShowAsSigned>1</ShowAsSigned>
           <VariableType>8 Bytes</VariableType>
           <Address>[pMoneyAddr]-8</Address>
@@ -109,7 +109,7 @@ writeInteger( "bLockMoney", 0 )
         <CheatEntry>
           <ID>224</ID>
           <Description>"Money Min. value"</Description>
-          <LastState Value="4294967" RealAddress="09230033"/>
+          <LastState Value="4294967" RealAddress="09220033"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>8 Bytes</VariableType>
           <Address>dMoneyMin</Address>
@@ -157,6 +157,10 @@ unregistersymbol(bLockHealth)
 unregistersymbol(bLockBravery)
 
 unregistersymbol(pSoldierBase)
+
+// Battle Turn Number
+unregistersymbol(injectPointTurnNumber)
+unregistersymbol(iTurnNumber)
 
 aobscan( injectPoint, EB E5 90 55 8B 41 7C )
 alloc( memCode, $4000 )
@@ -320,6 +324,36 @@ injectHandleEndTurn:
     nop
 registersymbol(injectHandleEndTurn)
 
+// Battle Turn Number
+/*
+!openxcom.exe+1117EF - C7 85 B8FCFFFF 13000000 - mov [ebp-00000348],00000013
+!openxcom.exe+1117F9 - E8 12542900           - call !openxcom.ZNK8OpenXcom15SavedBattleGame7getTurnEv
+
+!openxcom.exe+1117FE - 8D 95 E8FDFFFF        - lea edx,[ebp-00000218] &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+!openxcom.exe+111804 - 8D 8D E0FDFFFF        - lea ecx,[ebp-00000220]
+
+E8 12542900 8D 95 E8FDFFFF
+*/
+
+aobscan( injectPointTurnNumber, 8D 95 E8FDFFFF 8D 8D E0FDFFFF )
+
+alloc( memCodeTurnNumber, 128 )
+
+label(iTurnNumber)
+registersymbol(iTurnNumber)
+
+memCodeTurnNumber:
+    mov [iTurnNumber], eax
+    lea edx, [ebp-00000218]
+    jmp injectPointTurnNumber+5
+iTurnNumber:
+    dd 0
+
+injectPointTurnNumber:
+    jmp memCodeTurnNumber
+    nop
+registersymbol(injectPointTurnNumber)
+
 
 
 [DISABLE]
@@ -362,18 +396,37 @@ unregistersymbol(pFactionTurn)
 
 dealloc(memCodeHandleEndTurn)
 
+// Battle Turn Number
+
+injectPointTurnNumber:
+    db 8D 95 E8 FD FF FF
+
+unregistersymbol(injectPointTurnNumber)
+unregistersymbol(iTurnNumber)
+
+dealloc(memCodeTurnNumber)
+
 </AssemblerScript>
       <CheatEntries>
         <CheatEntry>
           <ID>78</ID>
           <Description>"Base ADDR"</Description>
-          <LastState Value="" RealAddress="092400D4"/>
+          <LastState Value="" RealAddress="001B00D4"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808080</Color>
           <VariableType>Array of byte</VariableType>
           <ByteLength>0</ByteLength>
           <Address>pSoldierBase</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>289</ID>
+          <Description>"iTurnNumber"</Description>
+          <LastState Value="3" RealAddress="001B4110"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>iTurnNumber</Address>
         </CheatEntry>
         <CheatEntry>
           <ID>88</ID>
@@ -497,7 +550,7 @@ end
         <CheatEntry>
           <ID>79</ID>
           <Description>"Time Units ( current soldier )"</Description>
-          <LastState Value="100" RealAddress="0AB2E95C"/>
+          <LastState Value="500" RealAddress="119047F4"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pSoldierBase]+7C</Address>
@@ -505,7 +558,7 @@ end
         <CheatEntry>
           <ID>80</ID>
           <Description>"Energy ( current soldier )"</Description>
-          <LastState Value="300" RealAddress="0AB2E960"/>
+          <LastState Value="500" RealAddress="119047F8"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pSoldierBase]+80</Address>
@@ -513,7 +566,7 @@ end
         <CheatEntry>
           <ID>81</ID>
           <Description>"Health ( current soldier )"</Description>
-          <LastState Value="600" RealAddress="0AB2E964"/>
+          <LastState Value="245" RealAddress="119047FC"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pSoldierBase]+84</Address>
@@ -521,7 +574,7 @@ end
         <CheatEntry>
           <ID>82</ID>
           <Description>"Bravery ( current soldier )"</Description>
-          <LastState Value="110" RealAddress="0AB2E968"/>
+          <LastState Value="44" RealAddress="11904800"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pSoldierBase]+88</Address>
@@ -529,7 +582,7 @@ end
         <CheatEntry>
           <ID>240</ID>
           <Description>"Restore Time Units at End Turn"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <Color>008000</Color>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
@@ -555,9 +608,9 @@ alloc( memCodeRestoreTU, 128 )
 label( defaultRestoreTU )
 
 memCodeRestoreTU:
-    //
-    cmp [pFactionTurn], #0 // not shure it's necessary check
-    je defaultRestoreTU
+    // if crash, then uncomment this lines
+    //cmp [pFactionTurn], #0 // not shure it's necessary check
+    //je defaultRestoreTU
     //
     cmp [ebx], 00 // check if Player -&gt; 00, Enemy -&gt; 1
     jne defaultRestoreTU
@@ -592,9 +645,9 @@ alloc( memCodeRestoreEN, 128 )
 label( defaultRestoreEN )
 
 memCodeRestoreEN:
-    //
-    cmp [pFactionTurn], #0 // not shure it's necessary check
-    je defaultRestoreEN
+    // if crash, then uncomment this lines
+    //cmp [pFactionTurn], #0 // not shure it's necessary check
+    //je defaultRestoreEN
     //
     cmp [ebx], 00 // check if Player -&gt; 00, Enemy -&gt; 1
     jne defaultRestoreEN
@@ -733,7 +786,7 @@ writeInteger( "bLockBravery", 0 )
             <CheatEntry>
               <ID>168</ID>
               <Description>"Time Units"</Description>
-              <LastState Value="100" RealAddress="0AB2EAFC"/>
+              <LastState Value="80" RealAddress="11904994"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[pSoldierBase]+21C</Address>
@@ -741,7 +794,7 @@ writeInteger( "bLockBravery", 0 )
             <CheatEntry>
               <ID>169</ID>
               <Description>"Energy"</Description>
-              <LastState Value="300" RealAddress="0AB2EB00"/>
+              <LastState Value="99" RealAddress="11904998"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[pSoldierBase]+220</Address>
@@ -749,7 +802,7 @@ writeInteger( "bLockBravery", 0 )
             <CheatEntry>
               <ID>170</ID>
               <Description>"Health"</Description>
-              <LastState Value="600" RealAddress="0AB2EB04"/>
+              <LastState Value="500" RealAddress="1190499C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[pSoldierBase]+224</Address>
@@ -757,7 +810,7 @@ writeInteger( "bLockBravery", 0 )
             <CheatEntry>
               <ID>171</ID>
               <Description>"Bravery"</Description>
-              <LastState Value="110" RealAddress="0AB2EB08"/>
+              <LastState Value="10" RealAddress="119049A0"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[pSoldierBase]+228</Address>
@@ -1254,7 +1307,7 @@ dealloc(memCodeCraftEdit)
         <CheatEntry>
           <ID>272</ID>
           <Description>"Base ADDR"</Description>
-          <LastState Value="" RealAddress="111F55F0"/>
+          <LastState Value="" RealAddress="11A7DD00"/>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808080</Color>
           <VariableType>Array of byte</VariableType>
@@ -1264,7 +1317,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>273</ID>
               <Description>"ID"</Description>
-              <LastState Value="1" RealAddress="111F5608"/>
+              <LastState Value="1" RealAddress="11A7DD18"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+18</Address>
@@ -1272,7 +1325,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>274</ID>
               <Description>"Name"</Description>
-              <LastState RealAddress="111F5614"/>
+              <LastState RealAddress="11A7DD24"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>String</VariableType>
               <Length>16</Length>
@@ -1284,7 +1337,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>275</ID>
               <Description>"undefined"</Description>
-              <LastState Value="540697710" RealAddress="111F5634"/>
+              <LastState Value="25" RealAddress="11A7DD44"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+44</Address>
@@ -1292,7 +1345,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>276</ID>
               <Description>"Fuel"</Description>
-              <LastState Value="20000" RealAddress="111F5670"/>
+              <LastState Value="20000" RealAddress="11A7DD80"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+80</Address>
@@ -1300,7 +1353,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>277</ID>
               <Description>"Damage"</Description>
-              <LastState Value="0" RealAddress="111F5674"/>
+              <LastState Value="0" RealAddress="11A7DD84"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+84</Address>
@@ -1308,7 +1361,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>278</ID>
               <Description>"Weapon #1 AMMO"</Description>
-              <LastState Value="99" RealAddress="1217FA04"/>
+              <LastState Value="99" RealAddress="11D0EC2C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+90</Address>
@@ -1320,7 +1373,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>279</ID>
               <Description>"Weapon #2 AMMO"</Description>
-              <LastState Value="99" RealAddress="1217FAF4"/>
+              <LastState Value="99" RealAddress="11D0EC5C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+90</Address>
@@ -1332,7 +1385,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>280</ID>
               <Description>"Status ( NOT EDITABLE STRING )"</Description>
-              <LastState Value="7" RealAddress="111F56A0"/>
+              <LastState Value="7" RealAddress="11A7DDB0"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+B0</Address>
@@ -1340,7 +1393,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>281</ID>
               <Description>"Status ( NOT EDITABLE STRING )"</Description>
-              <LastState RealAddress="111F56A4"/>
+              <LastState RealAddress="11A7DDB4"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>String</VariableType>
               <Length>16</Length>
@@ -1352,7 +1405,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>282</ID>
               <Description>"Status is ON MISSION"</Description>
-              <LastState Value="0" RealAddress="111F56B5"/>
+              <LastState Value="0" RealAddress="11A7DDC5"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+C5</Address>
@@ -1360,7 +1413,7 @@ dealloc(memCodeCraftEdit)
             <CheatEntry>
               <ID>283</ID>
               <Description>"Base Params"</Description>
-              <LastState Value="" RealAddress="0F0F36C0"/>
+              <LastState Value="" RealAddress="0F0F7988"/>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
@@ -1375,7 +1428,7 @@ dealloc(memCodeCraftEdit)
                   <Description>"Speed Max."</Description>
                   <DropDownList DisplayValueAsItem="1">5400:Default
 </DropDownList>
-                  <LastState Value="10800" RealAddress="0F0F36F4"/>
+                  <LastState Value="10800" RealAddress="0F0F79BC"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+34</Address>
@@ -1383,7 +1436,7 @@ dealloc(memCodeCraftEdit)
                 <CheatEntry>
                   <ID>285</ID>
                   <Description>"Acceleration"</Description>
-                  <LastState Value="5" RealAddress="0F0F36F8"/>
+                  <LastState Value="5" RealAddress="0F0F79C0"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+38</Address>
@@ -1391,7 +1444,7 @@ dealloc(memCodeCraftEdit)
                 <CheatEntry>
                   <ID>286</ID>
                   <Description>"Fuel Capacilty"</Description>
-                  <LastState Value="20000" RealAddress="0F0F36EC"/>
+                  <LastState Value="20000" RealAddress="0F0F79B4"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+2C</Address>
@@ -1399,7 +1452,7 @@ dealloc(memCodeCraftEdit)
                 <CheatEntry>
                   <ID>287</ID>
                   <Description>"Damage Capacilty"</Description>
-                  <LastState Value="2400" RealAddress="0F0F36F0"/>
+                  <LastState Value="2400" RealAddress="0F0F79B8"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+30</Address>
@@ -1407,7 +1460,7 @@ dealloc(memCodeCraftEdit)
                 <CheatEntry>
                   <ID>288</ID>
                   <Description>"Cargo Space"</Description>
-                  <LastState Value="26" RealAddress="0F0F3700"/>
+                  <LastState Value="26" RealAddress="0F0F79C8"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+40</Address>
@@ -2683,7 +2736,7 @@ dealloc(memCode_BaseMain)
         <CheatEntry>
           <ID>211</ID>
           <Description>"pBaseMain"</Description>
-          <LastState Value="11108D90" RealAddress="09270016"/>
+          <LastState Value="113E7448" RealAddress="092B0016"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808080</Color>
@@ -2693,7 +2746,7 @@ dealloc(memCode_BaseMain)
         <CheatEntry>
           <ID>212</ID>
           <Description>"pBaseMain_Bases"</Description>
-          <LastState Value="11108E3C" RealAddress="0927001A"/>
+          <LastState Value="113E74F4" RealAddress="092B001A"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808080</Color>
@@ -2703,7 +2756,7 @@ dealloc(memCode_BaseMain)
         <CheatEntry>
           <ID>213</ID>
           <Description>"Save name"</Description>
-          <LastState RealAddress="11108D98"/>
+          <LastState RealAddress="113E7450"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>String</VariableType>
           <Length>32</Length>
@@ -2721,7 +2774,7 @@ dealloc(memCode_BaseMain)
 3:Genius
 4:Superhuman
 </DropDownList>
-          <LastState Value="4" RealAddress="11108DA8"/>
+          <LastState Value="4" RealAddress="113E7460"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pBaseMain]+18</Address>
@@ -2732,7 +2785,7 @@ dealloc(memCode_BaseMain)
           <DropDownList ReadOnly="1" DisplayValueAsItem="1">0:No
 1:Yes
 </DropDownList>
-          <LastState Value="0" RealAddress="11108DB0"/>
+          <LastState Value="0" RealAddress="113E7468"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>Byte</VariableType>
           <Address>[pBaseMain]+20</Address>
@@ -2741,7 +2794,7 @@ dealloc(memCode_BaseMain)
           <ID>216</ID>
           <Description>"Game Time ▼"</Description>
           <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
-          <LastState Value="" RealAddress="1204B8D0"/>
+          <LastState Value="" RealAddress="11A3A3A0"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>Array of byte</VariableType>
           <ByteLength>0</ByteLength>
@@ -2750,7 +2803,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>217</ID>
               <Description>"seconds"</Description>
-              <LastState Value="0" RealAddress="1204B8D0"/>
+              <LastState Value="10" RealAddress="11A3A3A0"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+0</Address>
@@ -2758,7 +2811,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>218</ID>
               <Description>"minutes"</Description>
-              <LastState Value="48" RealAddress="1204B8D4"/>
+              <LastState Value="35" RealAddress="11A3A3A4"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+4</Address>
@@ -2766,7 +2819,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>219</ID>
               <Description>"hours"</Description>
-              <LastState Value="15" RealAddress="1204B8D8"/>
+              <LastState Value="14" RealAddress="11A3A3A8"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+8</Address>
@@ -2774,7 +2827,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>220</ID>
               <Description>"weekday"</Description>
-              <LastState Value="7" RealAddress="1204B8DC"/>
+              <LastState Value="1" RealAddress="11A3A3AC"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+C</Address>
@@ -2782,7 +2835,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>221</ID>
               <Description>"day"</Description>
-              <LastState Value="10" RealAddress="1204B8E0"/>
+              <LastState Value="11" RealAddress="11A3A3B0"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+10</Address>
@@ -2790,7 +2843,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>222</ID>
               <Description>"month"</Description>
-              <LastState Value="7" RealAddress="1204B8E4"/>
+              <LastState Value="7" RealAddress="11A3A3B4"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+14</Address>
@@ -2798,7 +2851,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>223</ID>
               <Description>"year"</Description>
-              <LastState Value="1999" RealAddress="1204B8E8"/>
+              <LastState Value="1999" RealAddress="11A3A3B8"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+18</Address>
@@ -2808,7 +2861,7 @@ dealloc(memCode_BaseMain)
         <CheatEntry>
           <ID>225</ID>
           <Description>"Globe Lon"</Description>
-          <LastState Value="4.71423664863278" RealAddress="11108DF8"/>
+          <LastState Value="0.78558107043553" RealAddress="113E74B0"/>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808000</Color>
           <VariableType>Double</VariableType>
@@ -2817,7 +2870,7 @@ dealloc(memCode_BaseMain)
         <CheatEntry>
           <ID>226</ID>
           <Description>"Globe Lat"</Description>
-          <LastState Value="-0.783840187138455" RealAddress="11108E00"/>
+          <LastState Value="0.380750876139062" RealAddress="113E74B8"/>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808000</Color>
           <VariableType>Double</VariableType>
@@ -2826,7 +2879,7 @@ dealloc(memCode_BaseMain)
         <CheatEntry>
           <ID>227</ID>
           <Description>"Camera Zoom"</Description>
-          <LastState Value="1" RealAddress="11108E08"/>
+          <LastState Value="1" RealAddress="113E74C0"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pBaseMain]+78</Address>
@@ -2837,7 +2890,7 @@ dealloc(memCode_BaseMain)
           <DropDownList ReadOnly="1" DisplayValueAsItem="1">0:All is Fine
 1: WARN!
 </DropDownList>
-          <LastState Value="0" RealAddress="11108E99"/>
+          <LastState Value="0" RealAddress="113E7551"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>Byte</VariableType>
           <Address>[pBaseMain]+109</Address>
@@ -2845,7 +2898,7 @@ dealloc(memCode_BaseMain)
         <CheatEntry>
           <ID>236</ID>
           <Description>"Money Cash"</Description>
-          <LastState Value="99309697" RealAddress="11E70BE0"/>
+          <LastState Value="101448737" RealAddress="11C089B8"/>
           <ShowAsSigned>1</ShowAsSigned>
           <VariableType>8 Bytes</VariableType>
           <Address>[[pBaseMain]+38]-8</Address>
@@ -2853,7 +2906,7 @@ dealloc(memCode_BaseMain)
         <CheatEntry>
           <ID>228</ID>
           <Description>"Bases ▼"</Description>
-          <LastState Value="" RealAddress="11F76578"/>
+          <LastState Value="" RealAddress="11D056F0"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>Array of byte</VariableType>
@@ -2863,7 +2916,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>229</ID>
               <Description>"Base #1"</Description>
-              <LastState Value="" RealAddress="11F76578"/>
+              <LastState Value="" RealAddress="11D056F0"/>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
@@ -2876,7 +2929,7 @@ dealloc(memCode_BaseMain)
           <ID>243</ID>
           <Description>"Alien Bases ▼"</Description>
           <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
-          <LastState Value="" RealAddress="11F76548"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>FF0000</Color>
@@ -2887,7 +2940,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>244</ID>
               <Description>"Base #1 ▼"</Description>
-              <LastState Value="" RealAddress="10F43548"/>
+              <LastState Value="" RealAddress="00000000"/>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
@@ -2900,7 +2953,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>249</ID>
                   <Description>"ID"</Description>
-                  <LastState Value="1936876918" RealAddress="10F43560"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+18</Address>
@@ -2908,7 +2960,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>246</ID>
                   <Description>"Lon"</Description>
-                  <LastState Value="2.75440725796243E214" RealAddress="10F43550"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <Color>808000</Color>
                   <VariableType>Double</VariableType>
@@ -2917,7 +2968,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>247</ID>
                   <Description>"Lat"</Description>
-                  <LastState Value="2.91123155943291E-258" RealAddress="10F43558"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <Color>808000</Color>
                   <VariableType>Double</VariableType>
@@ -2926,7 +2976,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>248</ID>
                   <Description>"Race"</Description>
-                  <LastState RealAddress="10F43590"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>String</VariableType>
                   <Length>16</Length>
@@ -2940,7 +2989,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>250</ID>
               <Description>"Base #2 ▼"</Description>
-              <LastState Value="" RealAddress="10F4354C"/>
+              <LastState Value="" RealAddress="00000000"/>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
@@ -2953,7 +3002,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>251</ID>
                   <Description>"ID"</Description>
-                  <LastState Value="980316009" RealAddress="10F43564"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+18</Address>
@@ -2961,7 +3009,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>252</ID>
                   <Description>"Lon"</Description>
-                  <LastState Value="1.33441303863014E160" RealAddress="10F43554"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>Double</VariableType>
                   <Address>+8</Address>
@@ -2969,7 +3016,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>253</ID>
                   <Description>"Lat"</Description>
-                  <LastState Value="1.28625682705784E248" RealAddress="10F4355C"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>Double</VariableType>
                   <Address>+10</Address>
@@ -2977,7 +3023,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>254</ID>
                   <Description>"Race"</Description>
-                  <LastState RealAddress="10F43594"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>String</VariableType>
                   <Length>16</Length>
@@ -2991,7 +3036,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>255</ID>
               <Description>"Base #3 ▼"</Description>
-              <LastState Value="" RealAddress="10F43550"/>
+              <LastState Value="" RealAddress="00000000"/>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
@@ -3004,7 +3049,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>256</ID>
                   <Description>"ID"</Description>
-                  <LastState Value="808333600" RealAddress="10F43568"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+18</Address>
@@ -3012,7 +3056,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>257</ID>
                   <Description>"Lon"</Description>
-                  <LastState Value="2.91123155943291E-258" RealAddress="10F43558"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>Double</VariableType>
                   <Address>+8</Address>
@@ -3020,7 +3063,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>258</ID>
                   <Description>"Lat"</Description>
-                  <LastState Value="3.0731701292243E-27" RealAddress="10F43560"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>Double</VariableType>
                   <Address>+10</Address>
@@ -3028,7 +3070,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>259</ID>
                   <Description>"Race"</Description>
-                  <LastState RealAddress="10F43598"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>String</VariableType>
                   <Length>16</Length>
@@ -3042,7 +3083,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>260</ID>
               <Description>"Base #4 ▼"</Description>
-              <LastState Value="" RealAddress="10F43554"/>
+              <LastState Value="" RealAddress="00000000"/>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
@@ -3055,7 +3096,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>261</ID>
                   <Description>"ID"</Description>
-                  <LastState Value="1769300490" RealAddress="10F4356C"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+18</Address>
@@ -3063,7 +3103,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>262</ID>
                   <Description>"Lon"</Description>
-                  <LastState Value="1.28625682705784E248" RealAddress="10F4355C"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>Double</VariableType>
                   <Address>+8</Address>
@@ -3071,7 +3110,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>263</ID>
                   <Description>"Lat"</Description>
-                  <LastState Value="1.30371160123701E-76" RealAddress="10F43564"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>Double</VariableType>
                   <Address>+10</Address>
@@ -3079,7 +3117,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>264</ID>
                   <Description>"Race"</Description>
-                  <LastState RealAddress="10F4359C"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>String</VariableType>
                   <Length>16</Length>
@@ -3093,7 +3130,7 @@ dealloc(memCode_BaseMain)
             <CheatEntry>
               <ID>265</ID>
               <Description>"Base #5 ▼"</Description>
-              <LastState Value="" RealAddress="10F43558"/>
+              <LastState Value="" RealAddress="00000000"/>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
@@ -3106,7 +3143,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>266</ID>
                   <Description>"ID"</Description>
-                  <LastState Value="540697708" RealAddress="10F43570"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+18</Address>
@@ -3114,7 +3150,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>267</ID>
                   <Description>"Lon"</Description>
-                  <LastState Value="3.0731701292243E-27" RealAddress="10F43560"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>Double</VariableType>
                   <Address>+8</Address>
@@ -3122,7 +3157,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>268</ID>
                   <Description>"Lat"</Description>
-                  <LastState Value="1.02297524287051E200" RealAddress="10F43568"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>Double</VariableType>
                   <Address>+10</Address>
@@ -3130,7 +3164,6 @@ dealloc(memCode_BaseMain)
                 <CheatEntry>
                   <ID>269</ID>
                   <Description>"Race"</Description>
-                  <LastState RealAddress="10F435A0"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>String</VariableType>
                   <Length>16</Length>
@@ -3154,7 +3187,7 @@ dealloc(memCode_BaseMain)
     <CheatEntry>
       <ID>237</ID>
       <Description>"Get Turn number [TEST]"</Description>
-      <LastState/>
+      <LastState Activated="1"/>
       <Color>008000</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -3229,6 +3262,7 @@ dealloc(memCodeGetTurn)
         <CheatEntry>
           <ID>239</ID>
           <Description>"addrEndTurn"</Description>
+          <LastState Value="05A3B718" RealAddress="001A0020"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
@@ -3237,6 +3271,7 @@ dealloc(memCodeGetTurn)
         <CheatEntry>
           <ID>238</ID>
           <Description>"Turn Number"</Description>
+          <LastState Value="3" RealAddress="001A001C"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>vEndTurn</Address>
@@ -3317,7 +3352,7 @@ dealloc(memCode)
         <CheatEntry>
           <ID>69</ID>
           <Description>"Base ADDR"</Description>
-          <LastState Value="" RealAddress="111F55F0"/>
+          <LastState Value="" RealAddress="00000000"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808080</Color>
@@ -3328,7 +3363,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>70</ID>
               <Description>"ID"</Description>
-              <LastState Value="1" RealAddress="111F5608"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+18</Address>
@@ -3336,7 +3370,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>73</ID>
               <Description>"Name"</Description>
-              <LastState RealAddress="111F5614"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>String</VariableType>
               <Length>16</Length>
@@ -3348,7 +3381,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>71</ID>
               <Description>"undefined"</Description>
-              <LastState Value="540697710" RealAddress="111F5634"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+44</Address>
@@ -3356,7 +3388,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>72</ID>
               <Description>"Fuel"</Description>
-              <LastState Value="20000" RealAddress="111F5670"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+80</Address>
@@ -3364,7 +3395,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>77</ID>
               <Description>"Damage"</Description>
-              <LastState Value="0" RealAddress="111F5674"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+84</Address>
@@ -3372,7 +3402,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>75</ID>
               <Description>"Weapon #1 AMMO"</Description>
-              <LastState Value="99" RealAddress="1217FA04"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+90</Address>
@@ -3384,7 +3413,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>76</ID>
               <Description>"Weapon #2 AMMO"</Description>
-              <LastState Value="99" RealAddress="1217FAF4"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+90</Address>
@@ -3396,7 +3424,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>74</ID>
               <Description>"Status ( NOT EDITABLE STRING )"</Description>
-              <LastState Value="7" RealAddress="111F56A0"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+B0</Address>
@@ -3404,7 +3431,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>163</ID>
               <Description>"Status ( NOT EDITABLE STRING )"</Description>
-              <LastState RealAddress="111F56A4"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>String</VariableType>
               <Length>16</Length>
@@ -3416,7 +3442,6 @@ dealloc(memCode)
             <CheatEntry>
               <ID>270</ID>
               <Description>"Status is ON MISSION"</Description>
-              <LastState Value="0" RealAddress="111F56B5"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>+C5</Address>
@@ -3424,7 +3449,7 @@ dealloc(memCode)
             <CheatEntry>
               <ID>152</ID>
               <Description>"Base Params"</Description>
-              <LastState Value="" RealAddress="0F0F36C0"/>
+              <LastState Value="" RealAddress="00000000"/>
               <ShowAsHex>1</ShowAsHex>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Array of byte</VariableType>
@@ -3439,7 +3464,6 @@ dealloc(memCode)
                   <Description>"Speed Max."</Description>
                   <DropDownList DisplayValueAsItem="1">5400:Default
 </DropDownList>
-                  <LastState Value="10800" RealAddress="0F0F36F4"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+34</Address>
@@ -3447,7 +3471,6 @@ dealloc(memCode)
                 <CheatEntry>
                   <ID>154</ID>
                   <Description>"Acceleration"</Description>
-                  <LastState Value="5" RealAddress="0F0F36F8"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+38</Address>
@@ -3455,7 +3478,6 @@ dealloc(memCode)
                 <CheatEntry>
                   <ID>155</ID>
                   <Description>"Fuel Capacilty"</Description>
-                  <LastState Value="20000" RealAddress="0F0F36EC"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+2C</Address>
@@ -3463,7 +3485,6 @@ dealloc(memCode)
                 <CheatEntry>
                   <ID>156</ID>
                   <Description>"Damage Capacilty"</Description>
-                  <LastState Value="2400" RealAddress="0F0F36F0"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+30</Address>
@@ -3471,7 +3492,6 @@ dealloc(memCode)
                 <CheatEntry>
                   <ID>157</ID>
                   <Description>"Cargo Space"</Description>
-                  <LastState Value="26" RealAddress="0F0F3700"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>+40</Address>
@@ -4375,23 +4395,18 @@ dealloc(memCode)
         <Element Offset="32" Vartype="Byte" Bytesize="1" OffsetHex="00000020" Description="Is IronMan" DisplayMethod="Unsigned Integer" BackgroundColor="FFFF00"/>
         <Element Offset="36" Vartype="Pointer" Bytesize="4" OffsetHex="00000024" Description="Game Time ▼" DisplayMethod="Unsigned Integer" BackgroundColor="FFFF00"/>
         <Element Offset="40" Vartype="Pointer" Bytesize="4" OffsetHex="00000028" Description="Research Scores" DisplayMethod="Unsigned Integer" BackgroundColor="FFFF00"/>
-        <Element Offset="44" Vartype="Pointer" Bytesize="4" OffsetHex="0000002C" DisplayMethod="Unsigned Integer"/>
-        <Element Offset="48" Vartype="Pointer" Bytesize="4" OffsetHex="00000030" DisplayMethod="Unsigned Integer"/>
-        <Element Offset="52" Vartype="Pointer" Bytesize="4" OffsetHex="00000034" DisplayMethod="Unsigned Integer"/>
+        <Element Offset="44" Vartype="Pointer" Bytesize="4" RLECount="3" OffsetHex="0000002C" DisplayMethod="Unsigned Integer"/>
         <Element Offset="56" Vartype="Pointer" Bytesize="4" OffsetHex="00000038" Description="Funds -&gt; target address-8" DisplayMethod="Unsigned Integer" BackgroundColor="FFFF00"/>
-        <Element Offset="60" Vartype="Pointer" Bytesize="4" RLECount="9" OffsetHex="0000003C" DisplayMethod="Unsigned Integer"/>
-        <Element Offset="96" Vartype="Pointer" Bytesize="4" OffsetHex="00000060" DisplayMethod="Unsigned Integer"/>
+        <Element Offset="60" Vartype="Pointer" Bytesize="4" RLECount="10" OffsetHex="0000003C" DisplayMethod="Unsigned Integer"/>
         <Element Offset="100" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000064" DisplayMethod="Unsigned Integer"/>
         <Element Offset="104" Vartype="Double" Bytesize="8" OffsetHex="00000068" Description="Lon" DisplayMethod="Unsigned Integer" BackgroundColor="FFFF00"/>
         <Element Offset="112" Vartype="Double" Bytesize="8" OffsetHex="00000070" Description="Lat" DisplayMethod="Unsigned Integer" BackgroundColor="FFFF00"/>
         <Element Offset="120" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000078" Description="Camera Zoom" DisplayMethod="Unsigned Integer"/>
         <Element Offset="124" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="0000007C" DisplayMethod="Unsigned Integer"/>
         <Element Offset="132" Vartype="Pointer" Bytesize="4" OffsetHex="00000084" Description="IDS" DisplayMethod="Unsigned Integer" BackgroundColor="FFFF00"/>
-        <Element Offset="136" Vartype="Pointer" Bytesize="4" OffsetHex="00000088" DisplayMethod="Unsigned Integer"/>
-        <Element Offset="140" Vartype="Pointer" Bytesize="4" OffsetHex="0000008C" DisplayMethod="Unsigned Integer"/>
+        <Element Offset="136" Vartype="Pointer" Bytesize="4" RLECount="2" OffsetHex="00000088" DisplayMethod="Unsigned Integer"/>
         <Element Offset="144" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000090" DisplayMethod="Unsigned Integer"/>
-        <Element Offset="148" Vartype="Pointer" Bytesize="4" OffsetHex="00000094" DisplayMethod="Unsigned Integer"/>
-        <Element Offset="152" Vartype="Pointer" Bytesize="4" RLECount="5" OffsetHex="00000098" DisplayMethod="Unsigned Integer"/>
+        <Element Offset="148" Vartype="Pointer" Bytesize="4" RLECount="6" OffsetHex="00000094" DisplayMethod="Unsigned Integer"/>
         <Element Offset="172" Vartype="Pointer" Bytesize="4" OffsetHex="000000AC" Description="Bases" DisplayMethod="Unsigned Integer" BackgroundColor="FFFF00"/>
         <Element Offset="176" Vartype="Pointer" Bytesize="4" RLECount="5" OffsetHex="000000B0" DisplayMethod="Unsigned Integer"/>
         <Element Offset="196" Vartype="4 Bytes" Bytesize="4" RLECount="6" OffsetHex="000000C4" DisplayMethod="Unsigned Integer"/>
@@ -4399,10 +4414,10 @@ dealloc(memCode)
         <Element Offset="224" Vartype="Pointer" Bytesize="4" RLECount="3" OffsetHex="000000E0" DisplayMethod="Unsigned Integer"/>
         <Element Offset="236" Vartype="4 Bytes" Bytesize="4" OffsetHex="000000EC" DisplayMethod="Unsigned Integer"/>
         <Element Offset="240" Vartype="Pointer" Bytesize="4" RLECount="6" OffsetHex="000000F0" DisplayMethod="Unsigned Integer"/>
+        <Element Offset="264" Vartype="Byte" Bytesize="1" OffsetHex="00000108" DisplayMethod="Unsigned Integer"/>
         <Element Offset="264" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000108" DisplayMethod="Unsigned Integer"/>
-        <Element Offset="264" Vartype="Byte" Bytesize="1" RLECount="4" OffsetHex="00000108" DisplayMethod="Unsigned Integer"/>
+        <Element Offset="265" Vartype="Byte" Bytesize="1" RLECount="4" OffsetHex="00000109" DisplayMethod="Unsigned Integer"/>
         <Element Offset="268" Vartype="4 Bytes" Bytesize="4" OffsetHex="0000010C" DisplayMethod="Unsigned Integer"/>
-        <Element Offset="268" Vartype="Byte" Bytesize="1" OffsetHex="0000010C" DisplayMethod="Unsigned Integer"/>
         <Element Offset="272" Vartype="Pointer" Bytesize="4" OffsetHex="00000110" DisplayMethod="Unsigned Integer"/>
         <Element Offset="276" Vartype="4 Bytes" Bytesize="4" RLECount="5" OffsetHex="00000114" DisplayMethod="Unsigned Integer"/>
         <Element Offset="296" Vartype="Pointer" Bytesize="4" OffsetHex="00000128" DisplayMethod="Unsigned Integer"/>

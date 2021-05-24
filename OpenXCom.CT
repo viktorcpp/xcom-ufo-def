@@ -5,7 +5,7 @@
       <ID>3</ID>
       <Description>"Money Here ▼"</Description>
       <Options moDeactivateChildrenAsWell="1"/>
-      <LastState Activated="1"/>
+      <LastState/>
       <Color>009700</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -101,7 +101,7 @@ writeInteger( "bLockMoney", 0 )
         <CheatEntry>
           <ID>18</ID>
           <Description>"Player Cash"</Description>
-          <LastState Value="98521260" RealAddress="0BE3D678"/>
+          <LastState Value="153641600" RealAddress="0BE3D678"/>
           <ShowAsSigned>1</ShowAsSigned>
           <VariableType>8 Bytes</VariableType>
           <Address>[pMoneyAddr]-8</Address>
@@ -109,7 +109,6 @@ writeInteger( "bLockMoney", 0 )
         <CheatEntry>
           <ID>224</ID>
           <Description>"Money Min. value for freezing"</Description>
-          <LastState Value="4294967" RealAddress="090F0033"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>8 Bytes</VariableType>
           <Address>dMoneyMin</Address>
@@ -120,7 +119,7 @@ writeInteger( "bLockMoney", 0 )
       <ID>29</ID>
       <Description>"Unit params in Battle  ▼"</Description>
       <Options moDeactivateChildrenAsWell="1"/>
-      <LastState Activated="1"/>
+      <LastState/>
       <Color>008000</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -422,7 +421,6 @@ dealloc(memCodeTurnNumber)
         <CheatEntry>
           <ID>289</ID>
           <Description>"iTurnNumber"</Description>
-          <LastState Value="0" RealAddress="09104110"/>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808080</Color>
           <VariableType>4 Bytes</VariableType>
@@ -451,7 +449,7 @@ writeInteger( "bKillAllEnemies", 0 )
         <CheatEntry>
           <ID>158</ID>
           <Description>"Test"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 {$lua}
@@ -550,6 +548,7 @@ end
         <CheatEntry>
           <ID>79</ID>
           <Description>"Time Units ( current soldier )"</Description>
+          <LastState Value="500" RealAddress="0CC45224"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pSoldierBase]+7C</Address>
@@ -557,6 +556,7 @@ end
         <CheatEntry>
           <ID>80</ID>
           <Description>"Energy ( current soldier )"</Description>
+          <LastState Value="500" RealAddress="0CC45228"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pSoldierBase]+80</Address>
@@ -564,6 +564,7 @@ end
         <CheatEntry>
           <ID>81</ID>
           <Description>"Health ( current soldier )"</Description>
+          <LastState Value="600" RealAddress="0CC4522C"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pSoldierBase]+84</Address>
@@ -571,6 +572,7 @@ end
         <CheatEntry>
           <ID>82</ID>
           <Description>"Bravery ( current soldier )"</Description>
+          <LastState Value="110" RealAddress="0CC45230"/>
           <ShowAsSigned>0</ShowAsSigned>
           <VariableType>4 Bytes</VariableType>
           <Address>[pSoldierBase]+88</Address>
@@ -578,7 +580,7 @@ end
         <CheatEntry>
           <ID>240</ID>
           <Description>"Restore Time Units at End Turn"</Description>
-          <LastState Activated="1"/>
+          <LastState/>
           <Color>008000</Color>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
@@ -782,6 +784,7 @@ writeInteger( "bLockBravery", 0 )
             <CheatEntry>
               <ID>168</ID>
               <Description>"Time Units"</Description>
+              <LastState Value="100" RealAddress="0CC453C4"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[pSoldierBase]+21C</Address>
@@ -789,6 +792,7 @@ writeInteger( "bLockBravery", 0 )
             <CheatEntry>
               <ID>169</ID>
               <Description>"Energy"</Description>
+              <LastState Value="300" RealAddress="0CC453C8"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[pSoldierBase]+220</Address>
@@ -796,6 +800,7 @@ writeInteger( "bLockBravery", 0 )
             <CheatEntry>
               <ID>170</ID>
               <Description>"Health"</Description>
+              <LastState Value="600" RealAddress="0CC453CC"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[pSoldierBase]+224</Address>
@@ -803,6 +808,7 @@ writeInteger( "bLockBravery", 0 )
             <CheatEntry>
               <ID>171</ID>
               <Description>"Bravery"</Description>
+              <LastState Value="110" RealAddress="0CC453D0"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[pSoldierBase]+228</Address>
@@ -814,7 +820,7 @@ writeInteger( "bLockBravery", 0 )
     <CheatEntry>
       <ID>160</ID>
       <Description>"Disable Soldier Wounding After Battle"</Description>
-      <LastState Activated="1"/>
+      <LastState/>
       <Color>008000</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -860,7 +866,7 @@ unregistersymbol(injectNoWoundApply)
     <CheatEntry>
       <ID>162</ID>
       <Description>"Disable Craft damage"</Description>
-      <LastState Activated="1"/>
+      <LastState/>
       <Color>008000</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -914,7 +920,7 @@ dealloc(memCodeCraftDamageDisable)
     <CheatEntry>
       <ID>164</ID>
       <Description>"Disable Craft Fuel consumption"</Description>
-      <LastState Activated="1"/>
+      <LastState/>
       <Color>008000</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -995,7 +1001,7 @@ unregistersymbol(injectPountConsFuelFunc)
     <CheatEntry>
       <ID>290</ID>
       <Description>"Disable Craft Ammo consumption"</Description>
-      <LastState Activated="1"/>
+      <LastState/>
       <Color>008000</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -2783,7 +2789,7 @@ unregistersymbol(injectPointBaseFacilities)
       <ID>210</ID>
       <Description>"MAIN new ▼    WIP"</Description>
       <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
-      <LastState Activated="1"/>
+      <LastState/>
       <Color>008000</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>[ENABLE]
@@ -2975,7 +2981,6 @@ end
         <CheatEntry>
           <ID>211</ID>
           <Description>"pBaseMain"</Description>
-          <LastState Value="0C242C18" RealAddress="000D002D"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808080</Color>
@@ -2985,7 +2990,6 @@ end
         <CheatEntry>
           <ID>212</ID>
           <Description>"pBaseMain_Bases"</Description>
-          <LastState Value="0C242CC4" RealAddress="000D0031"/>
           <ShowAsHex>1</ShowAsHex>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808080</Color>
@@ -3050,7 +3054,7 @@ end
             <CheatEntry>
               <ID>218</ID>
               <Description>"minutes"</Description>
-              <LastState Value="1" RealAddress="0C721D34"/>
+              <LastState Value="52" RealAddress="0C721D34"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+4</Address>
@@ -3058,7 +3062,7 @@ end
             <CheatEntry>
               <ID>219</ID>
               <Description>"hours"</Description>
-              <LastState Value="5" RealAddress="0C721D38"/>
+              <LastState Value="15" RealAddress="0C721D38"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+8</Address>
@@ -3066,7 +3070,7 @@ end
             <CheatEntry>
               <ID>220</ID>
               <Description>"weekday"</Description>
-              <LastState Value="2" RealAddress="0C721D3C"/>
+              <LastState Value="3" RealAddress="0C721D3C"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+C</Address>
@@ -3074,7 +3078,7 @@ end
             <CheatEntry>
               <ID>221</ID>
               <Description>"day"</Description>
-              <LastState Value="7" RealAddress="0C721D40"/>
+              <LastState Value="22" RealAddress="0C721D40"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>+10</Address>
@@ -3100,7 +3104,7 @@ end
         <CheatEntry>
           <ID>225</ID>
           <Description>"Globe Lon"</Description>
-          <LastState Value="5.15436863229138" RealAddress="0C242C80"/>
+          <LastState Value="4.43251406050561" RealAddress="0C242C80"/>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808000</Color>
           <VariableType>Double</VariableType>
@@ -3109,7 +3113,7 @@ end
         <CheatEntry>
           <ID>226</ID>
           <Description>"Globe Lat"</Description>
-          <LastState Value="-1.00201107996558" RealAddress="0C242C88"/>
+          <LastState Value="-1.02705823559367" RealAddress="0C242C88"/>
           <ShowAsSigned>0</ShowAsSigned>
           <Color>808000</Color>
           <VariableType>Double</VariableType>
@@ -3137,7 +3141,7 @@ end
         <CheatEntry>
           <ID>236</ID>
           <Description>"Money Cash"</Description>
-          <LastState Value="98521260" RealAddress="0BE3D678"/>
+          <LastState Value="153641600" RealAddress="0BE3D678"/>
           <ShowAsSigned>1</ShowAsSigned>
           <VariableType>8 Bytes</VariableType>
           <Address>[[pBaseMain]+38]-8</Address>
@@ -3152,7 +3156,7 @@ end
             <CheatEntry>
               <ID>305</ID>
               <Description>"Money"</Description>
-              <LastState Value="98521260" RealAddress="0BE3D678"/>
+              <LastState Value="153641600" RealAddress="0BE3D678"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>8 Bytes</VariableType>
               <Address>[[pBaseMain]+38]-8</Address>
@@ -3370,7 +3374,7 @@ end
             <CheatEntry>
               <ID>332</ID>
               <Description>"Money"</Description>
-              <LastState Value="111619832" RealAddress="0BE3EEF0"/>
+              <LastState Value="376928262" RealAddress="0BE3EEF0"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>8 Bytes</VariableType>
               <Address>[[pBaseMain]+4C]+28</Address>
@@ -3467,7 +3471,7 @@ end
             <CheatEntry>
               <ID>344</ID>
               <Description>"Money"</Description>
-              <LastState Value="15" RealAddress="0CDCDB1C"/>
+              <LastState Value="575" RealAddress="0CDCDB1C"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>4 Bytes</VariableType>
               <Address>[[pBaseMain]+28]+14</Address>
@@ -3564,7 +3568,7 @@ end
             <CheatEntry>
               <ID>356</ID>
               <Description>"Money"</Description>
-              <LastState Value="107159670" RealAddress="0BE3ED40"/>
+              <LastState Value="317347760" RealAddress="0BE3ED40"/>
               <ShowAsSigned>1</ShowAsSigned>
               <VariableType>8 Bytes</VariableType>
               <Address>[[pBaseMain]+58]+28</Address>
@@ -3633,7 +3637,7 @@ end
                 <CheatEntry>
                   <ID>364</ID>
                   <Description>"value"</Description>
-                  <LastState Value="67" RealAddress="0C248B80"/>
+                  <LastState Value="86" RealAddress="0C248B80"/>
                   <ShowAsSigned>0</ShowAsSigned>
                   <VariableType>4 Bytes</VariableType>
                   <Address>[[[[pBaseMain]+84]+4]+4]+28</Address>
@@ -4243,15 +4247,6 @@ memrec_childs_clear( memrec )
       <Description>"=========================================="</Description>
       <LastState Value="" RealAddress="00000000"/>
       <GroupHeader>1</GroupHeader>
-    </CheatEntry>
-    <CheatEntry>
-      <ID>483</ID>
-      <Description>"No description"</Description>
-      <LastState Value="0CD9C958" RealAddress="0C73373C"/>
-      <ShowAsHex>1</ShowAsHex>
-      <ShowAsSigned>0</ShowAsSigned>
-      <VariableType>4 Bytes</VariableType>
-      <Address>[[[pBaseMain_Bases]]+0]+44</Address>
     </CheatEntry>
   </CheatEntries>
   <UserdefinedSymbols/>
